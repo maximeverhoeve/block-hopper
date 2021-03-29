@@ -18,20 +18,27 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100,
 );
+// const camera =  new THREE.PerspectiveCamera( 50, windowSizes.width / windowSizes.height, 1, 100 );
 camera.position.z = 3;
 scene.add(camera);
 
+const fog = new THREE.Fog('#100C25', 0, 30)
+scene.fog = fog;
+
 // Controls
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
+// const controls = new OrbitControls(camera, canvas);
+// controls.enableDamping = true;
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({
   canvas,
+  alpha: true,
+  // antialias: true
 });
 renderer.setSize(windowSizes.width, windowSizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
 
 window.addEventListener('resize', () => {
@@ -53,9 +60,9 @@ window.addEventListener('resize', () => {
  */
 
 const init = () => {
-  const SceneMain = new MainScene({ scene });
+  const SceneMain = new MainScene({ scene, camera });
   const update = () => {
-    controls.update();
+    // controls.update();
     SceneMain.update();
     // Render
     renderer.render(scene, camera);
