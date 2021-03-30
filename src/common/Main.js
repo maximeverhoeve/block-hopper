@@ -4,6 +4,7 @@ import Floor from "../components/Floor";
 import Player from "../components/Player";
 import GameObjectManager from "../models/GameObjectManager";
 import { gui } from "./globals";
+import Enemy from '../components/Enemy';
 
 const GoManager = new GameObjectManager();
 const clock = new THREE.Clock()
@@ -60,14 +61,18 @@ export default class MainScene {
         // const matcapsTexture = textureLoader.load('/textures/matcaps/6.png')
         const matcapsTexture2 = textureLoader.load('/textures/matcaps/8.png')
 
+        // Draw Enemy
+        const enemy = GoManager.createGameObject(Enemy, { world: this.world})
+        scene.add(enemy.mesh);
+
         // Draw Player
         const material2 = new THREE.MeshMatcapMaterial({ matcap: matcapsTexture2,color: 0xcdff});
         const player = GoManager.createGameObject(Player, {material: null, world: this.world})
         player.mesh.material.matcap = matcapsTexture2;
         scene.add(player.mesh);
-        // this.camera.position.x = 5;
+
+
         this.camera.position.y = 2;
-        // this.camera.position.z = 3;
         gui.add(this.camera.position, 'x', 0, 10, 0.5).name('CameraPos x')
         gui.add(this.camera.position, 'y', 0, 10, 0.5).name('CameraPos y')
         gui.add(this.camera.position, 'z', 0, 10, 0.5).name('CameraPos z')

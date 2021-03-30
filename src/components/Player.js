@@ -1,12 +1,13 @@
 import gsap from 'gsap/gsap-core';
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
+import SwipeListener from 'swipe-listener';
 import { gui } from '../common/globals';
 
 // const clock = new THREE.Clock();
 const playerOptions = {
     height: 9,
-    color: 0xbb5c02,
+    color: 0xff7600,
     speed: 0.2,
 }
 const guiPlayer = gui.addFolder('Player');
@@ -14,6 +15,7 @@ guiPlayer.add(playerOptions, 'height', 0.5, 20, 0.5).name('Jump height');
 guiPlayer.add(playerOptions, 'speed', 0.1, 1.5, 0.1).name('Movement speed');
 export default class Player {
     constructor({ material, geometry, world } = {}) {
+        this.currentPos = 0;
         const width = 1;
         const height = 1;
         const depth = 1;
@@ -32,20 +34,41 @@ export default class Player {
         const shape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
 
         this.body = new CANNON.Body({
-            mass: 2000,
+            mass: 1,
             position: new CANNON.Vec3(0, 10, 0),
             shape
         })
-        // this.body.position.copy(this.mesh.position);
-        // this.body.mass = 1000;
+
         world.addBody(this.body);
         
         this.setupMovement();
+        this.setupMobileMovement();
+    }
+
+    setupMobileMovement() {
+        const container = document.querySelector('canvas.webgl');
+        this.swipeListener = SwipeListener(container);
+        container.addEventListener('swipe', (e) => {
+        const { directions } = e.detail;
+        
+        if (directions.left) {
+            if (this.currentPos > -1) this.currentPos -= 1;
+        }
+        
+        if (directions.right) {
+            if (this.currentPos < 1) this.currentPos += 1;
+        }
+        
+        if (directions.top) {
+            console.log('Swiped top.');
+            this.jump()
+        }
+        gsap.to(this.body.position, { x: this.currentPos, duration: playerOptions.speed })
+});
     }
 
     setupMovement() {
         // listen to keydown for jumping
-        this.currentPos = 0;
         document.addEventListener('keydown', ({ keyCode }) => {
             const a = 65; 
             const leftArrow = 37; // left arrow
@@ -62,6 +85,8 @@ export default class Player {
                         if (this.currentPos < 1) this.currentPos += 1;
                     break;
                 }
+                case 87:  // w
+                case 38:  // arrow up
                 case 32: { // space
                     this.jump();
                     break;
@@ -72,6 +97,10 @@ export default class Player {
             // go to new currentPos;
             gsap.to(this.body.position, { x: this.currentPos, duration: playerOptions.speed })
         })
+    }
+
+    destroy() {
+        // remove all event listeners and swipelisteners
     }
 
     jump() {
