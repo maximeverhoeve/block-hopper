@@ -26,7 +26,7 @@ export default class Enemy {
 
         this.body = new CANNON.Body({
             mass: 0,
-            position: new CANNON.Vec3(0, height / 2, -3 ),
+            position: new CANNON.Vec3(1.5, height / 2, 0 ),
             shape
         })
         world.addBody(this.body);

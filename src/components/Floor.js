@@ -26,6 +26,7 @@ export default class Floor {
             new CANNON.Vec3(-1, 0, 0),
             Math.PI * 0.5
         )
+        floorBody.isFloor = true;
         world.addBody(floorBody);
     }
 
