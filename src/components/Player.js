@@ -17,13 +17,18 @@ const leftArrow = 37; // left arrow
 const d = 68; // d
 const rightArrow = 39; // right arrow
 
+const maxRight = 1;
+const maxLeft = -1;
+
 const guiPlayer = gui.addFolder('Player');
 guiPlayer.add(playerOptions, 'height', 0.5, 20, 0.5).name('Jump height');
 guiPlayer.add(playerOptions, 'speed', 0.1, 1.5, 0.1).name('Movement speed');
 export default class Player {
-    constructor({ material, geometry, world } = {}) {
+    constructor({ material, geometry, world, onDead } = {}) {
+
         this.currentPos = 0;
         this.hasCollided = false;
+        
         const width = 0.9;
         const height = 0.9;
         const depth = 0.9;
@@ -48,17 +53,26 @@ export default class Player {
         this.body = new CANNON.Body({
             mass: 1,
             position: new CANNON.Vec3(0, 4, 0),
-            shape
+            shape,
+            allowSleep: false,
         })
+        this.body.name = 'player';
         world.addBody(this.body);
 
         // Collision
 
         const handleCollide = (e) => {
-            if(!this.hasCollided && !e.body.isFloor) this.hasCollided = true;
+            if(!this.hasCollided && e.body.name === 'enemy') {
+                this.hasCollided = true;
+                onDead(this);
+            }
 
             // Apply force on contact point to make explosion effect
-            console.log(e);
+            if (!this.explosion  && !e.body.isFloor) {
+                this.explosion = true;
+                this.body.applyLocalForce(new CANNON.Vec3(0, -100 ,0),e.contact.ni)
+                console.log(e);
+            }
         };
         this.body.addEventListener('collide', handleCollide)
         
@@ -91,19 +105,22 @@ export default class Player {
         }
     }
 
-    handleMovement() {
+    handleMovement() {  
         if (!this.hasCollided) {
             this.downKeys.forEach(k => {
                 switch(k) {
                     case a:
                     case leftArrow: {
+                        if (this.body.position.x >= maxLeft) {
                         this.body.position.x -= 0.05;
+                        }
                         break;
                     }
                     case d:
-                    case rightArrow: { // move right        
-                        this.body.position.x += 0.05;
-                        this.body.velocity.x += 0.05;
+                    case rightArrow: { // move right  
+                        if (this.body.position.x <= maxRight) {
+                            this.body.position.x += 0.05;
+                        }
                         break
                     }
                     case 87:  // w

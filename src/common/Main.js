@@ -5,12 +5,16 @@ import Player from "../components/Player";
 import GameObjectManager from "../models/GameObjectManager";
 import { gui } from "./globals";
 import Enemy from '../components/Enemy';
+import gsap from 'gsap/gsap-core';
+import cannonDebugger from 'cannon-es-debugger';
+import Field from '../components/Field';
 
 const GoManager = new GameObjectManager();
 const clock = new THREE.Clock()
 let oldElapsedTime = 0;
 export default class MainScene {
     constructor({ scene, camera }) {
+   
         this.scene = scene;
         this.camera = camera;
         // this.camera.position.y = 1;
@@ -41,6 +45,8 @@ export default class MainScene {
         this.world.allowSleep = true;
         this.world.gravity.set(0, -20, 0);
 
+        // cannonDebugger(this.scene, this.world.bodies, {});
+
         gui.add(this.world.gravity, 'y', -100, 0, 1).name('World gravity');
         const defaultMaterial = new CANNON.Material('default');
 
@@ -60,14 +66,12 @@ export default class MainScene {
         const textureLoader = new THREE.TextureLoader(loadingManger);
         // const matcapsTexture = textureLoader.load('/textures/matcaps/6.png')
         const matcapsTexture2 = textureLoader.load('/textures/matcaps/8.png')
-
-        // Draw Enemy
-        const enemy = GoManager.createGameObject(Enemy, { world: this.world})
-        scene.add(enemy.mesh);
+        // Draw Field
+        const field = GoManager.createGameObject(Field, {world: this.world});
 
         // Draw Player
         const material2 = new THREE.MeshMatcapMaterial({ matcap: matcapsTexture2,color: 0xcdff});
-        const player = GoManager.createGameObject(Player, {material: null, world: this.world})
+        const player = GoManager.createGameObject(Player, {material: null, world: this.world, onDead: () => this.handleDead(this)})
         player.mesh.material.matcap = matcapsTexture2;
         scene.add(player.mesh);
 
@@ -83,6 +87,25 @@ export default class MainScene {
         const floor = GoManager.createGameObject(Floor, { world: this.world })
         scene.add(floor.mesh);
 
+        // DrawEnemy every 4 sec
+        this.drawEnemy();
+        this.enemyInterval = setInterval(() => this.drawEnemy(), 1000);
+
+    }
+
+    handleDead(mainScene) {
+        clearInterval(this.enemyInterval);
+        gsap.to(mainScene.camera.position, {y: 10, z: -1, duration: 3});
+        gsap.to(mainScene.camera.rotation, {x: -Math.PI * 0.5, duration: 3});
+    }
+
+    drawEnemy() {
+        const enemy = GoManager.createGameObject(Enemy, { world: this.world, scene: this.scene, onRemove: this.handleEnemyRemoval})
+        this.scene.add(enemy.mesh);
+    }
+
+    handleEnemyRemoval(enemy) {
+        GoManager.removeGameObject(enemy);
     }
 
     update() {

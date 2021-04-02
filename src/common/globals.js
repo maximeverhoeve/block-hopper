@@ -7,6 +7,13 @@ export const windowSizes = {
   height: window.innerHeight,
 };
 
+export const enemyParams = {
+    removeDistance: 5,
+  }
+// Add gui
+gui.add(enemyParams, 'removeDistance', -1, 10).name('Enemy remove distance');
+
 export default {
   name: 'test',
+  
 }

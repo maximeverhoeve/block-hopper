@@ -30,6 +30,7 @@
     "webpack-merge": "^5.7.3"
   },
   "devDependencies": {
+    "cannon-es-debugger": "^0.1.2",
     "eslint": "^7.23.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.1.0",
