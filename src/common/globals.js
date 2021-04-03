@@ -19,4 +19,5 @@ enemyFolder.add(enemyParams, 'speed', 1, 20).name('Speed');
 export default {
   name: 'test',
   deltaTime: 0,
+  elapsedTime: 0,
 }

@@ -110,9 +110,9 @@ export default class MainScene {
     }
 
     update() {
-        const elapsedTime = clock.getElapsedTime()
-        globals.deltaTime = elapsedTime - oldElapsedTime;
-        oldElapsedTime = elapsedTime;
+        globals.elapsedTime = clock.getElapsedTime()
+        globals.deltaTime = globals.elapsedTime - oldElapsedTime;
+        oldElapsedTime = globals.elapsedTime;
         GoManager.update();
         // Update Physics world
         this.world.step(1 / 60, globals.deltaTime, 3);
