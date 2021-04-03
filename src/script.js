@@ -19,7 +19,8 @@ const camera = new THREE.PerspectiveCamera(
   100,
 );
 // const camera =  new THREE.PerspectiveCamera( 50, windowSizes.width / windowSizes.height, 1, 100 );
-camera.position.z = 3;
+camera.position.y = 0.5;
+camera.position.z = 2.5;
 scene.add(camera);
 
 const fog = new THREE.Fog('#100C25', 0, 30)

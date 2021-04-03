@@ -28,6 +28,7 @@ export default class Player {
 
         this.currentPos = 0;
         this.hasCollided = false;
+        this.world = world;
         
         const width = 0.9;
         const height = 0.9;
@@ -56,6 +57,8 @@ export default class Player {
             shape,
             allowSleep: false,
         })
+        this.body.fixedRotation = true;
+        this.body.updateMassProperties();
         this.body.name = 'player';
         world.addBody(this.body);
 
@@ -70,8 +73,9 @@ export default class Player {
             // Apply force on contact point to make explosion effect
             if (!this.explosion  && !e.body.isFloor) {
                 this.explosion = true;
-                this.body.applyLocalForce(new CANNON.Vec3(0, -100 ,0),e.contact.ni)
-                console.log(e);
+                this.body.fixedRotation = false;
+                this.body.updateMassProperties();
+                this.body.applyLocalForce(new CANNON.Vec3(0, 600, 0), new CANNON.Vec3(0, 1, 0));
             }
         };
         this.body.addEventListener('collide', handleCollide)
@@ -84,11 +88,9 @@ export default class Player {
         this.downKeys = [];
         document.addEventListener('keydown', ({ keyCode }) => {
             this.body.wakeUp();
-            console.log(keyCode);
             if (!this.downKeys.includes(keyCode)) this.downKeys.push(keyCode);
         })
         document.addEventListener('keyup', ({ keyCode }) => {
-            console.log(keyCode);
             const newDownKeys = [...this.downKeys];
             this.downKeys = newDownKeys.filter((dwnKey) => dwnKey !== keyCode);
         })

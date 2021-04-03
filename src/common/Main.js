@@ -15,7 +15,7 @@ let oldElapsedTime = 0;
 const fps = 1 / 60;
 export default class MainScene {
     constructor({ scene, camera }) {
-   
+        this.isGameStarted = true;
         this.scene = scene;
         this.camera = camera;
         // this.camera.position.y = 1;
@@ -72,12 +72,12 @@ export default class MainScene {
 
         // Draw Player
         const material2 = new THREE.MeshMatcapMaterial({ matcap: matcapsTexture2,color: 0xcdff});
-        const player = GoManager.createGameObject(Player, {material: null, world: this.world, onDead: () => this.handleDead(this)})
-        player.mesh.material.matcap = matcapsTexture2;
-        scene.add(player.mesh);
+        this.player = GoManager.createGameObject(Player, {material: null, world: this.world, onDead: () => this.handleDead(this)})
+        this.player.mesh.material.matcap = matcapsTexture2;
+        scene.add(this.player.mesh);
 
 
-        this.camera.position.y = 2;
+        
         gui.add(this.camera.position, 'x', 0, 10, 0.5).name('CameraPos x')
         gui.add(this.camera.position, 'y', 0, 10, 0.5).name('CameraPos y')
         gui.add(this.camera.position, 'z', 0, 10, 0.5).name('CameraPos z')
@@ -88,9 +88,24 @@ export default class MainScene {
         const floor = GoManager.createGameObject(Floor, { world: this.world })
         scene.add(floor.mesh);
 
-        // DrawEnemy every 4 sec
-        this.drawEnemy();
-        this.enemyInterval = setInterval(() => this.drawEnemy(), 1000);
+        // GUI
+        gui.add(this, 'startGame');
+    }
+
+    startGame() {
+        if (globals.isGameStarted) return;
+        globals.isGameStarted = true;
+
+        gsap.to(this.camera.position, { y: 2, z: 4.5, duration: 0.8 });
+        // Cool incomming animation player
+        // this.player.prepareForStart();
+
+         // DrawEnemy every 4 sec
+         this.drawEnemy();
+         this.enemyInterval = setInterval(() => this.drawEnemy(), 1000);
+    }
+
+    resetGame() {
 
     }
 

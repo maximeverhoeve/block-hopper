@@ -14,10 +14,11 @@ export const enemyParams = {
 // Add gui
 const enemyFolder = gui.addFolder('Enemy');
 enemyFolder.add(enemyParams, 'removeDistance', -1, 10).name('Enemy remove distance');
-enemyFolder.add(enemyParams, 'speed', 1, 20).name('Speed');
+enemyFolder.add(enemyParams, 'speed', 1, 40).name('Speed');
 
 export default {
   name: 'test',
   deltaTime: 0,
   elapsedTime: 0,
+  isGameStarted: false,
 }
