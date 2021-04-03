@@ -2,7 +2,7 @@ import gsap from 'gsap/gsap-core';
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import SwipeListener from 'swipe-listener';
-import { enemyParams, gui } from '../common/globals';
+import globals, { enemyParams, gui } from '../common/globals';
 
 export default class Enemy {
     constructor({ world, scene, onRemove } = {}) {
@@ -72,8 +72,8 @@ export default class Enemy {
 
     update() {
         this.checkOutOfBoundaries();
-        if (!this.hasCollided) this.body.position.z += 0.1
 
+            if (!this.hasCollided) this.body.position.z += globals.deltaTime * enemyParams.speed
         // Physics update
         this.mesh.position.copy(this.body.position);
         this.mesh.quaternion.copy(this.body.quaternion);

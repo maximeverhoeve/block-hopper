@@ -9,11 +9,14 @@ export const windowSizes = {
 
 export const enemyParams = {
     removeDistance: 5,
+    speed: 20,
   }
 // Add gui
-gui.add(enemyParams, 'removeDistance', -1, 10).name('Enemy remove distance');
+const enemyFolder = gui.addFolder('Enemy');
+enemyFolder.add(enemyParams, 'removeDistance', -1, 10).name('Enemy remove distance');
+enemyFolder.add(enemyParams, 'speed', 1, 20).name('Speed');
 
 export default {
   name: 'test',
-  
+  deltaTime: 0,
 }

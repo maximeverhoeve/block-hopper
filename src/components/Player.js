@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
-import { gui } from '../common/globals';
+import globals, { gui } from '../common/globals';
 
 // const clock = new THREE.Clock();
 const playerOptions = {
     height: 9,
     color: 0xff7600,
-    speed: 0.2,
+    speed: 8,
 }
 
 
@@ -22,7 +22,7 @@ const maxLeft = -1;
 
 const guiPlayer = gui.addFolder('Player');
 guiPlayer.add(playerOptions, 'height', 0.5, 20, 0.5).name('Jump height');
-guiPlayer.add(playerOptions, 'speed', 0.1, 1.5, 0.1).name('Movement speed');
+guiPlayer.add(playerOptions, 'speed', 1, 20, 1).name('Movement speed');
 export default class Player {
     constructor({ material, geometry, world, onDead } = {}) {
 
@@ -105,21 +105,21 @@ export default class Player {
         }
     }
 
-    handleMovement() {  
+    handleMovement() {
         if (!this.hasCollided) {
             this.downKeys.forEach(k => {
                 switch(k) {
                     case a:
                     case leftArrow: {
                         if (this.body.position.x >= maxLeft) {
-                        this.body.position.x -= 0.05;
+                        this.body.position.x -= globals.deltaTime * playerOptions.speed;
                         }
                         break;
                     }
                     case d:
                     case rightArrow: { // move right  
                         if (this.body.position.x <= maxRight) {
-                            this.body.position.x += 0.05;
+                            this.body.position.x += globals.deltaTime * playerOptions.speed;
                         }
                         break
                     }
@@ -130,7 +130,7 @@ export default class Player {
                         break;
                     }
                     default:
-                        return;
+                        
                 }
             })
         }
@@ -139,7 +139,7 @@ export default class Player {
     update() {
         // console.log(this.body.collisionResponse)
         // const elapsedTime = clock.1etElapsedTime();
-        this.handleMovement();
+            this.handleMovement();
         // this.mesh.position.y = Math.sin(2);
         this.mesh.position.copy(this.body.position);
         

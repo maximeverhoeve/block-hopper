@@ -1,17 +1,18 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
+import gsap from 'gsap/gsap-core';
+import cannonDebugger from 'cannon-es-debugger';
 import Floor from "../components/Floor";
 import Player from "../components/Player";
 import GameObjectManager from "../models/GameObjectManager";
-import { gui } from "./globals";
+import globals, { gui } from "./globals";
 import Enemy from '../components/Enemy';
-import gsap from 'gsap/gsap-core';
-import cannonDebugger from 'cannon-es-debugger';
 import Field from '../components/Field';
 
 const GoManager = new GameObjectManager();
 const clock = new THREE.Clock()
 let oldElapsedTime = 0;
+const fps = 1 / 60;
 export default class MainScene {
     constructor({ scene, camera }) {
    
@@ -110,10 +111,10 @@ export default class MainScene {
 
     update() {
         const elapsedTime = clock.getElapsedTime()
-        const deltaTime = elapsedTime - oldElapsedTime;
+        globals.deltaTime = elapsedTime - oldElapsedTime;
         oldElapsedTime = elapsedTime;
         GoManager.update();
         // Update Physics world
-        this.world.step(1 / 60, deltaTime, 3);
+        this.world.step(1 / 60, globals.deltaTime, 3);
     }
 }
