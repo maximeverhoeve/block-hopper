@@ -75,8 +75,7 @@ export default class MainScene {
         // const material2 = new THREE.MeshMatcapMaterial({ matcap: matcapsTexture2,color: 0xcdff});
         this.player = GoManager.createGameObject(Player, {matcap: playerMatcap, world: this.world, scene: this.scene, onDead: () => this.handleDead(this)})
 
-        // Spawn player after 1 sec
-        setTimeout(() => this.player.spawn(), 1000)
+        this.player.spawn()
         gsap.to(this.camera.position, {x: cameraParams.initialX,y: cameraParams.initialY, z: cameraParams.initialZ, duration: 1})
         
         gui.add(this.camera.position, 'x', 0, 10, 0.5).name('CameraPos x')
@@ -92,6 +91,16 @@ export default class MainScene {
         // GUI
         gui.add(this, 'startGame');
         gui.add(this, 'resetGame');
+
+        /**
+         * UI
+         */
+
+        this.$playButton = document.querySelector('.play-button');
+        this.$playButton.addEventListener('click', () => {
+            this.$playButton.style.opacity = 0;
+            this.startGame();
+        })
     }
 
     startGame() {
@@ -118,7 +127,7 @@ export default class MainScene {
         // reset score
         // reposition camera
         gsap.to(this.camera.rotation, {x: 0, duration: 0.8});
-        gsap.to(this.camera.position, { x: cameraParams.initialX, y: cameraParams.initialY, z: cameraParams.initialZ, duration: 0.8 }).then(() => globals.gameOver = false);
+        gsap.to(this.camera.position, { x: cameraParams.initialX, y: cameraParams.initialY, z: cameraParams.initialZ, duration: 0.8 }).then(() => {globals.gameOver = false; gsap.to(this.$playButton.style, {opacity: 1, duration: 0.8})});
         globals.isGameStarted = false;
     }
 
