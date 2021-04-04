@@ -73,6 +73,9 @@ export default class MainScene {
         // Draw Player
         const material2 = new THREE.MeshMatcapMaterial({ matcap: matcapsTexture2,color: 0xcdff});
         this.player = GoManager.createGameObject(Player, {material: null, world: this.world, scene: this.scene, onDead: () => this.handleDead(this)})
+
+        // Spawn player after 1 sec
+        setTimeout(() => this.player.spawn(), 1000)
         
         gui.add(this.camera.position, 'x', 0, 10, 0.5).name('CameraPos x')
         gui.add(this.camera.position, 'y', 0, 10, 0.5).name('CameraPos y')

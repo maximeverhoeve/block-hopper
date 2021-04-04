@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import globals, { gui } from '../common/globals';
 import gsap from 'gsap/gsap-core';
+import { resetBodyPosition } from '../helpers/bodyHelpers';
+import { CompressedPixelFormat } from 'three';
 
 // const clock = new THREE.Clock();
 const playerOptions = {
@@ -29,6 +31,7 @@ export default class Player {
         this.props = props;
         const { material, geometry, world, onDead, scene } = props;
         this.onDead = onDead;
+        this.spawned = false;
         this.scene = scene;
         this.world = world;
         this.geometry = geometry;
@@ -42,9 +45,7 @@ export default class Player {
         this.height = 0.9;
         this.depth = 0.9;
 
-      
-        this.spawn();
-        this.collisionHandler();
+     
         
         // Movement
         this.setupMovement();
@@ -69,7 +70,7 @@ export default class Player {
   
           this.body = new CANNON.Body({
               mass: 1,
-              position: new CANNON.Vec3(0, 4, 0),
+              position: new CANNON.Vec3(0, 2, 0),
               shape,
               allowSleep: false,
           })
@@ -77,11 +78,15 @@ export default class Player {
           this.body.updateMassProperties();
           this.body.name = 'player';
           this.world.addBody(this.body);
+          this.mesh.scale.set(0,0,0);
           this.scene.add(this.mesh);
+          gsap.to(this.mesh.scale, {x: 1, y: 1, z: 1, duration: 0.8});
+          this.spawned = true;
+          this.collisionHandler();
     }
     
     collisionHandler() {
-         const handleCollide = (e) => {
+        const handleCollide = (e) => {
             if(!this.hasCollided && e.body.name === 'enemy') {
                 this.hasCollided = true;
                 this.onDead(this);
@@ -95,7 +100,7 @@ export default class Player {
                 this.body.applyLocalForce(new CANNON.Vec3(0, 600, 0), new CANNON.Vec3(0, 1, 0));
             }
         };
-        this.body.addEventListener('collide', handleCollide)
+        if (this.spawned) this.body.addEventListener('collide', handleCollide)
     }
 
     setupMovement() {
@@ -111,13 +116,18 @@ export default class Player {
     }
 
     resetPosition() {
-        gsap.to(this.body.position, { x: 0, y: (this.height / 2), z: 0, duration: 0.8});
-        gsap.to(this.body.quaternion, { x: 0, y: 0, z: 0, duration: 0.8}).then(() => {
+        gsap.to(this.mesh.scale, {x: 0, y: 0, z: 0, duration: 0.2}).then(() => {
+            resetBodyPosition(this.body);
+            this.hasCollided = false;
+            this.explosion = false;
+            this.body.fixedRotation = true;
+            this.body.updateMassProperties();
+            gsap.to(this.mesh.scale, {x: 1, y: 1, z: 1, duration: 0.8})
         });
-        this.hasCollided = false;
-        this.explosion = false;
-        this.body.fixedRotation = true;
-        this.body.updateMassProperties();
+        // gsap.to(this.body.position, { x: 0, y: (this.height / 2), z: 0, duration: 0.8});
+        // gsap.to(this.body.quaternion, { x: 0, y: 0, z: 0, duration: 0.8}).then(() => {
+        // }).then(() =>  resetBodyPosition(this.body));
+       
     }
 
     destroy() {
@@ -173,8 +183,10 @@ export default class Player {
         // const elapsedTime = clock.1etElapsedTime();
             this.handleMovement();
         // this.mesh.position.y = Math.sin(2);
-        this.mesh.position.copy(this.body.position);
+        if (this.spawned) {
+            this.mesh.position.copy(this.body.position);
+            this.mesh.quaternion.copy(this.body.quaternion);
+        }
         
-        this.mesh.quaternion.copy(this.body.quaternion);
     }
 };
