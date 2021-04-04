@@ -5,27 +5,29 @@ import SwipeListener from 'swipe-listener';
 import globals, { enemyParams, gui } from '../common/globals';
 
 export default class Enemy {
-    constructor({ world, scene, onRemove } = {}) {
+    constructor({ world, scene, matcap, onRemove } = {}) {
         this.currentPos = 0;
         this.name = 'enemy';
         this.world = world;
         this.scene = scene;
         this.onRemove = onRemove;
         const width = 1;
-        const height = 1;
+        const height = Math.round(Math.random() + 1) ;
         const depth = 1;
         const randomX = (Math.random() - 0.5) * 2;
-        const spawnPos = new CANNON.Vec3(Math.round(randomX), height / 2, -30)
+        const spawnPos = new CANNON.Vec3(Math.round(randomX), height / 2, -60)
         this.geometry = new THREE.BoxGeometry(width, height, depth);
-        this.material = new THREE.MeshStandardMaterial({
-            metalness: 0.4,
-            roughness: 0.8,
-            color: 0xffffff
-        });
+        // this.material = new THREE.MeshStandardMaterial({
+        //     metalness: 0.4,
+        //     roughness: 0.8,
+        //     color: 0x2ECFCA
+        // });
+        this.material = new THREE.MeshMatcapMaterial({ matcap: matcap});
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         // Shadows
         // this.mesh.castShadow = true;
         this.mesh.receiveShadow = true;
+        this.mesh.castShadow = true;
         
         
         // Physics body

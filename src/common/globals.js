@@ -25,7 +25,7 @@ enemyFolder.add(enemyParams, 'speed', 1, 40).name('Speed');
  */
 
 export const cameraParams = {
-  initialX: 0,
+  initialX: 1,
   initialY: 0.5,
   initialZ: 2.5,
 }
@@ -36,4 +36,5 @@ export default {
   elapsedTime: 0,
   isGameStarted: false,
   gameOver: false,
+  playTime: 0,
 }

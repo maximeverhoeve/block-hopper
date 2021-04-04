@@ -7,11 +7,13 @@ export default class Floor {
     constructor({ world } = {}) {
         const geometry = new THREE.PlaneGeometry(50,30);
         // const material = new THREE.MeshBasicMaterial({ wireframe: false, color: '#100C25' });
-        const material = new THREE.MeshStandardMaterial({
-            color: '#0b081a',
+        const material = new THREE.ShadowMaterial({
+            // color: '#0b081a',
+            // color: '#F9F3DE',
             // metalness: 0.3,
             // roughness: 0.4,
         });
+        material.opacity = 0.05;
         this.mesh = new THREE.Mesh(geometry, material);
         this.mesh.rotation.x = Math.PI * -0.5;
         this.mesh.position.z = -10;

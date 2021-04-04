@@ -23,7 +23,7 @@ camera.position.y = 0.5;
 camera.position.z = 2.5;
 scene.add(camera);
 
-const fog = new THREE.Fog('#100C25', 0, 30)
+const fog = new THREE.Fog('#F9F3DE', 0, 60)
 scene.fog = fog;
 
 // Controls

@@ -7,9 +7,9 @@ import { CompressedPixelFormat } from 'three';
 
 // const clock = new THREE.Clock();
 const playerOptions = {
-    height: 9,
-    color: 0xff7600,
-    speed: 8,
+    height: 10,
+    color: 0xFF4E62,
+    speed: 9,
 }
 
 
@@ -29,13 +29,14 @@ guiPlayer.add(playerOptions, 'speed', 1, 20, 1).name('Movement speed');
 export default class Player {
     constructor(props = {}) {
         this.props = props;
-        const { material, geometry, world, onDead, scene } = props;
+        const { material, geometry, world, onDead, scene, matcap } = props;
         this.onDead = onDead;
         this.spawned = false;
         this.scene = scene;
         this.world = world;
         this.geometry = geometry;
         this.material = material;
+        this.matcap = matcap;
 
         this.currentPos = 0;
         this.hasCollided = false;
@@ -54,12 +55,12 @@ export default class Player {
     spawn() {
           // MESH
           if (!this.geometry) this.geometry = new THREE.BoxGeometry(this.width, this.height, this.depth);
-          if (!this.material) this.material = new THREE.MeshStandardMaterial({
-              metalness: 0.4,
-              roughness: 0.8,
-              color: playerOptions.color
-          });
-          else this.material = material
+        //   if (!this.material) this.material = new THREE.MeshStandardMaterial({
+        //       metalness: 0.2,
+        //     //   roughness: 0.,
+        //       color: playerOptions.color
+        //   });
+          if (!this.material) this.material = new THREE.MeshMatcapMaterial({ matcap: this.matcap});;
           this.mesh = new THREE.Mesh(this.geometry, this.material);
           this.mesh.castShadow = true;
           guiPlayer.addColor(playerOptions, 'color').onChange(() => this.material.color.set(playerOptions.color));
@@ -106,8 +107,8 @@ export default class Player {
     setupMovement() {
         this.downKeys = [];
         document.addEventListener('keydown', ({ keyCode }) => {
-            this.body.wakeUp();
             if (!this.downKeys.includes(keyCode)) this.downKeys.push(keyCode);
+            this.handleMovement();
         })
         document.addEventListener('keyup', ({ keyCode }) => {
             const newDownKeys = [...this.downKeys];
