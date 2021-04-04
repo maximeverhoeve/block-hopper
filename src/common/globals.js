@@ -7,6 +7,10 @@ export const windowSizes = {
   height: window.innerHeight,
 };
 
+/**
+ * ENEMIES
+ */
+
 export const enemyParams = {
     removeDistance: 5,
     speed: 20,
@@ -16,9 +20,20 @@ const enemyFolder = gui.addFolder('Enemy');
 enemyFolder.add(enemyParams, 'removeDistance', -1, 10).name('Enemy remove distance');
 enemyFolder.add(enemyParams, 'speed', 1, 40).name('Speed');
 
+/**
+ * CAMERA
+ */
+
+export const cameraParams = {
+  initialX: 0,
+  initialY: 0.5,
+  initialZ: 2.5,
+}
+
 export default {
   name: 'test',
   deltaTime: 0,
   elapsedTime: 0,
   isGameStarted: false,
+  gameOver: false,
 }

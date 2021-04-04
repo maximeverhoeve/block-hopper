@@ -5,7 +5,7 @@ import cannonDebugger from 'cannon-es-debugger';
 import Floor from "../components/Floor";
 import Player from "../components/Player";
 import GameObjectManager from "../models/GameObjectManager";
-import globals, { gui } from "./globals";
+import globals, { cameraParams, gui } from "./globals";
 import Enemy from '../components/Enemy';
 import Field from '../components/Field';
 
@@ -17,7 +17,7 @@ export default class MainScene {
     constructor({ scene, camera }) {
         this.isGameStarted = true;
         this.scene = scene;
-        this.camera = camera;
+        this.camera = camera
         // this.camera.position.y = 1;
 
         /**
@@ -72,11 +72,7 @@ export default class MainScene {
 
         // Draw Player
         const material2 = new THREE.MeshMatcapMaterial({ matcap: matcapsTexture2,color: 0xcdff});
-        this.player = GoManager.createGameObject(Player, {material: null, world: this.world, onDead: () => this.handleDead(this)})
-        this.player.mesh.material.matcap = matcapsTexture2;
-        scene.add(this.player.mesh);
-
-
+        this.player = GoManager.createGameObject(Player, {material: null, world: this.world, scene: this.scene, onDead: () => this.handleDead(this)})
         
         gui.add(this.camera.position, 'x', 0, 10, 0.5).name('CameraPos x')
         gui.add(this.camera.position, 'y', 0, 10, 0.5).name('CameraPos y')
@@ -90,6 +86,7 @@ export default class MainScene {
 
         // GUI
         gui.add(this, 'startGame');
+        gui.add(this, 'resetGame');
     }
 
     startGame() {
@@ -106,12 +103,22 @@ export default class MainScene {
     }
 
     resetGame() {
-
+        if (!globals.isGameStarted) return;
+        if (!globals.gameOver) return;
+        // remove all enemies
+        GoManager.gameObjects.array.forEach(gameObj => gameObj.name === 'enemy' && gameObj.destroy());
+        // reposition player
+        this.player.resetPosition();
+        // reset score
+        // reposition camera
+        gsap.to(this.camera.rotation, {x: 0, duration: 0.8});
+        gsap.to(this.camera.position, { x: cameraParams.initialX, y: cameraParams.initialY, z: cameraParams.initialZ, duration: 0.8 }).then(() => globals.gameOver = false);
+        globals.isGameStarted = false;
     }
 
     handleDead(mainScene) {
         clearInterval(this.enemyInterval);
-        gsap.to(mainScene.camera.position, {y: 10, z: -1, duration: 3});
+        gsap.to(mainScene.camera.position, {y: 10, z: -1, duration: 3}).then(() => globals.gameOver = true);
         gsap.to(mainScene.camera.rotation, {x: -Math.PI * 0.5, duration: 3});
     }
 

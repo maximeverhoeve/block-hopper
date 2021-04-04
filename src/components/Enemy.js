@@ -7,6 +7,7 @@ import globals, { enemyParams, gui } from '../common/globals';
 export default class Enemy {
     constructor({ world, scene, onRemove } = {}) {
         this.currentPos = 0;
+        this.name = 'enemy';
         this.world = world;
         this.scene = scene;
         this.onRemove = onRemove;

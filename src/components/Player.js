@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import globals, { gui } from '../common/globals';
+import gsap from 'gsap/gsap-core';
 
 // const clock = new THREE.Clock();
 const playerOptions = {
@@ -24,54 +25,70 @@ const guiPlayer = gui.addFolder('Player');
 guiPlayer.add(playerOptions, 'height', 0.5, 20, 0.5).name('Jump height');
 guiPlayer.add(playerOptions, 'speed', 1, 20, 1).name('Movement speed');
 export default class Player {
-    constructor({ material, geometry, world, onDead } = {}) {
+    constructor(props = {}) {
+        this.props = props;
+        const { material, geometry, world, onDead, scene } = props;
+        this.onDead = onDead;
+        this.scene = scene;
+        this.world = world;
+        this.geometry = geometry;
+        this.material = material;
 
         this.currentPos = 0;
         this.hasCollided = false;
         this.world = world;
         
-        const width = 0.9;
-        const height = 0.9;
-        const depth = 0.9;
+        this.width = 0.9;
+        this.height = 0.9;
+        this.depth = 0.9;
 
-        // MESH
-        if (!geometry) this.geometry = new THREE.BoxGeometry(width, height, depth);
-        else this.geometry = geometry
-        if (!material) this.material = new THREE.MeshStandardMaterial({
-            metalness: 0.4,
-            roughness: 0.8,
-            color: playerOptions.color
-        });
-        else this.material = material
-        this.mesh = new THREE.Mesh(this.geometry, this.material);
-        this.mesh.castShadow = true;
-        guiPlayer.addColor(playerOptions, 'color').onChange(() => this.material.color.set(playerOptions.color));
+      
+        this.spawn();
+        this.collisionHandler();
+        
+        // Movement
+        this.setupMovement();
+    }
 
-
-        // Physics body
-        const shape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
-
-        this.body = new CANNON.Body({
-            mass: 1,
-            position: new CANNON.Vec3(0, 4, 0),
-            shape,
-            allowSleep: false,
-        })
-        this.body.fixedRotation = true;
-        this.body.updateMassProperties();
-        this.body.name = 'player';
-        world.addBody(this.body);
-
-        // Collision
-
-        const handleCollide = (e) => {
+    spawn() {
+          // MESH
+          if (!this.geometry) this.geometry = new THREE.BoxGeometry(this.width, this.height, this.depth);
+          if (!this.material) this.material = new THREE.MeshStandardMaterial({
+              metalness: 0.4,
+              roughness: 0.8,
+              color: playerOptions.color
+          });
+          else this.material = material
+          this.mesh = new THREE.Mesh(this.geometry, this.material);
+          this.mesh.castShadow = true;
+          guiPlayer.addColor(playerOptions, 'color').onChange(() => this.material.color.set(playerOptions.color));
+  
+  
+          // Physics body
+          const shape = new CANNON.Box(new CANNON.Vec3(this.width * 0.5, this.height * 0.5, this.depth * 0.5))
+  
+          this.body = new CANNON.Body({
+              mass: 1,
+              position: new CANNON.Vec3(0, 4, 0),
+              shape,
+              allowSleep: false,
+          })
+          this.body.fixedRotation = true;
+          this.body.updateMassProperties();
+          this.body.name = 'player';
+          this.world.addBody(this.body);
+          this.scene.add(this.mesh);
+    }
+    
+    collisionHandler() {
+         const handleCollide = (e) => {
             if(!this.hasCollided && e.body.name === 'enemy') {
                 this.hasCollided = true;
-                onDead(this);
+                this.onDead(this);
             }
 
             // Apply force on contact point to make explosion effect
-            if (!this.explosion  && !e.body.isFloor) {
+            if (!this.explosion  && !e.body.isFloor && !globals.gameOver) {
                 this.explosion = true;
                 this.body.fixedRotation = false;
                 this.body.updateMassProperties();
@@ -79,9 +96,6 @@ export default class Player {
             }
         };
         this.body.addEventListener('collide', handleCollide)
-        
-        // Movement
-        this.setupMovement();
     }
 
     setupMovement() {
@@ -96,8 +110,24 @@ export default class Player {
         })
     }
 
+    resetPosition() {
+        gsap.to(this.body.position, { x: 0, y: (this.height / 2), z: 0, duration: 0.8});
+        gsap.to(this.body.quaternion, { x: 0, y: 0, z: 0, duration: 0.8}).then(() => {
+        });
+        this.hasCollided = false;
+        this.explosion = false;
+        this.body.fixedRotation = true;
+        this.body.updateMassProperties();
+    }
+
     destroy() {
         // remove all event listeners and swipelisteners
+        this.body.removeEventListener('collide', this.handleCollision);
+        this.world.removeBody(this.body);
+        this.material.dispose();
+        this.geometry.dispose();
+        this.scene.remove(this.mesh)
+        this.onRemove(this);
     }
 
     jump() {
