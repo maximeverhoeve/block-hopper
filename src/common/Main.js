@@ -66,8 +66,8 @@ export default class MainScene {
         const textureLoader = new THREE.TextureLoader(loadingManger);
         this.textureLoader = textureLoader;
         // const matcapsTexture = textureLoader.load('/textures/matcaps/6.png')
-        const playerMatcap = textureLoader.load('/textures/matcaps/15.png')
-        this.enemyMatcap = textureLoader.load('/textures/matcaps/12.png')
+        const playerMatcap = textureLoader.load('./textures/matcaps/15.png')
+        this.enemyMatcap = textureLoader.load('./textures/matcaps/12.png')
         // Draw Field
         const field = GoManager.createGameObject(Field, {world: this.world});
 
