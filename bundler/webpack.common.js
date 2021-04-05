@@ -23,10 +23,10 @@ module.exports = {
   module: {
     rules: [
       // HTML
-      {
-        test: /\.(html)$/,
-        use: ['html-loader'],
-      },
+      // {
+      //   test: /\.(html)$/,
+      //   use: ['html-loader'],
+      // },
 
       // JS
       {
@@ -49,7 +49,6 @@ module.exports = {
             loader: 'file-loader',
             options: {
               outputPath: 'assets/images/',
-              esModule: false
             },
           },
         ],
@@ -63,7 +62,6 @@ module.exports = {
             loader: 'file-loader',
             options: {
               outputPath: 'assets/fonts/',
-              esModule: false
             },
           },
         ],
