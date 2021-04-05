@@ -97,7 +97,7 @@ export default class MainScene {
          */
 
         this.$playButton = document.querySelector('.play-button');
-        this.$playButton.addEventListener('click', () => {
+        this.$playButton?.addEventListener('click', () => {
             this.$playButton.style.opacity = 0;
             this.startGame();
         })
