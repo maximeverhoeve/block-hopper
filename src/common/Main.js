@@ -115,7 +115,7 @@ export default class MainScene {
         this.drawEnemy();
         const customInterval = () => {
             this.drawEnemy()
-            if (!this.stopInterval) setTimeout(customInterval, enemyParams.interval);
+            if (!this.stopInterval) setTimeout(customInterval, enemyParams.interval - (globals.level * 20));
             else this.stopInterval = false;
         }
         setTimeout(customInterval, enemyParams.interval);
@@ -157,6 +157,7 @@ export default class MainScene {
         globals.deltaTime = globals.elapsedTime - oldElapsedTime;
         oldElapsedTime = globals.elapsedTime;
         globals.playTime = globals.elapsedTime - this.timeStarted;
+        globals.level = Math.floor(globals.playTime / 10);
         GoManager.update();
         // Update Physics world
         this.world.step(1 / 60, globals.deltaTime, 3);
