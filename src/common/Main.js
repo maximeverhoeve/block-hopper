@@ -5,7 +5,7 @@ import cannonDebugger from 'cannon-es-debugger';
 import Floor from "../components/Floor";
 import Player from "../components/Player";
 import GameObjectManager from "../models/GameObjectManager";
-import globals, { cameraParams, gui } from "./globals";
+import globals, { cameraParams, enemyParams, gui } from "./globals";
 import Enemy from '../components/Enemy';
 import Field from '../components/Field';
 
@@ -112,8 +112,13 @@ export default class MainScene {
         // this.player.prepareForStart();
 
          // DrawEnemy every 4 sec
-         this.drawEnemy();
-         this.enemyInterval = setInterval(() => this.drawEnemy(), 1000);
+        this.drawEnemy();
+        const customInterval = () => {
+            this.drawEnemy()
+            if (!this.stopInterval) setTimeout(customInterval, enemyParams.interval);
+            else this.stopInterval = false;
+        }
+        setTimeout(customInterval, enemyParams.interval);
          this.timeStarted = globals.elapsedTime;
     }
 
@@ -132,8 +137,8 @@ export default class MainScene {
     }
 
     handleDead(mainScene) {
-        clearInterval(this.enemyInterval);
-        gsap.to(mainScene.camera.position, {y: 10, z: -1, duration: 3}).then(() => globals.gameOver = true);
+        this.stopInterval = true;
+        gsap.to(mainScene.camera.position, { y: 10, z: -1, duration: 3 }).then(() => { globals.gameOver = true });
         gsap.to(mainScene.camera.rotation, {x: -Math.PI * 0.5, duration: 3});
     }
 
