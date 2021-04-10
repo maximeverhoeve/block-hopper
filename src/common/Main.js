@@ -15,9 +15,9 @@ let oldElapsedTime = 0;
 const fps = 1 / 60;
 export default class MainScene {
     constructor({ scene, camera }) {
-        this.isGameStarted = true;
         this.scene = scene;
-        this.camera = camera
+        this.camera = camera;
+        this.levelText = 0;
         
         /**
          * Lights
@@ -111,7 +111,7 @@ export default class MainScene {
         // Cool incomming animation player
         // this.player.prepareForStart();
 
-         // DrawEnemy every 4 sec
+         // DrawEnemy 
         this.drawEnemy();
         const customInterval = () => {
             this.drawEnemy()
@@ -132,8 +132,16 @@ export default class MainScene {
         // reset score
         // reposition camera
         gsap.to(this.camera.rotation, {x: 0, duration: 0.8});
-        gsap.to(this.camera.position, { x: cameraParams.initialX, y: cameraParams.initialY, z: cameraParams.initialZ, duration: 0.8 }).then(() => {globals.gameOver = false; gsap.to(this.$playButton.style, {opacity: 1, duration: 0.8})});
-        globals.isGameStarted = false;
+        gsap.to(this.camera.position, { x: cameraParams.initialX, y: cameraParams.initialY, z: cameraParams.initialZ, duration: 0.8 }).then(() => {
+            gsap.to(this.$playButton.style, { opacity: 1, duration: 0.8 })
+
+            // reset globals
+            globals.isGameStarted = false;
+            globals.gameOver = false;
+            globals.level = 0;
+            this.levelText = 0;
+            document.querySelector('#js-level').innerHTML = 0;
+        });
     }
 
     handleDead(mainScene) {
@@ -157,7 +165,15 @@ export default class MainScene {
         globals.deltaTime = globals.elapsedTime - oldElapsedTime;
         oldElapsedTime = globals.elapsedTime;
         globals.playTime = globals.elapsedTime - this.timeStarted;
-        globals.level = Math.floor(globals.playTime / 10);
+        if (!globals.gameOver && globals.isGameStarted) {
+            globals.level = Math.floor(globals.playTime / 10);
+        }
+
+        // draw level in ui
+        if (this.levelText < globals.level) {
+            document.querySelector('#js-level').innerHTML = globals.level;
+            this.levelText = globals.level;
+        }
         GoManager.update();
         // Update Physics world
         this.world.step(1 / 60, globals.deltaTime, 3);
